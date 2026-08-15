@@ -58,7 +58,7 @@ Signed upload to `https://api.cloudinary.com/v1_1/$CLOUDINARY_CLOUD_NAME/image/u
 - Post-live (Telegram only): day + Music Suggestion, reminder to add the track manually from phone (Instagram's music picker is mobile-app-only, not available via API).
 - **Daily run summary call (Vapi)** — fires once, unconditionally, after both sweeps finish (success or failure, every run, not just on error). See below.
 
-**Telegram mechanism**: raw Bot API, same pattern as Buffer/Vapi/Cloudinary — no connector. `POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage` with JSON body `{ "chat_id": "$TELEGRAM_CHAT_ID", "text": "<message>" }`.
+**Telegram mechanism**: raw Bot API, same pattern as Buffer/Vapi/Cloudinary — no connector. `POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage` with JSON body `{ "chat_id": "$TELEGRAM_CHAT_ID", "text": "<message>" }`. Send the body as proper UTF-8 JSON (or `--data-urlencode` if using curl) — a raw `-d` with an em dash or curly quote in the text fails with `400: strings must be encoded in UTF-8`, confirmed live during setup.
 
 ## Daily run summary call
 Runs at the very end of every run, after Sweep 1 and Sweep 2 both complete — this is a status update, not a failure-only alert.

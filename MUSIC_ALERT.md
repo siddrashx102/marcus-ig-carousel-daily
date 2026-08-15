@@ -32,7 +32,7 @@ Daily, 9:05 PM IST (Custom time trigger, 5 min after Buffer's fixed post time �
 - **Failure script**: *"Alert. Instagram post for day \<Day> failed to go live. \<one-line reason>. For full error details, check the Telegram message. Goodbye."*
 
 ## Telegram
-Raw Bot API call, same pattern as Buffer/Vapi — no connector needed: `POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage` with JSON body `{ "chat_id": "$TELEGRAM_CHAT_ID", "text": "<message>" }`.
+Raw Bot API call, same pattern as Buffer/Vapi — no connector needed: `POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage` with JSON body `{ "chat_id": "$TELEGRAM_CHAT_ID", "text": "<message>" }`. Send as proper UTF-8 JSON (or `--data-urlencode` if using curl) — a raw `-d` with an em dash or curly quote fails with `400: strings must be encoded in UTF-8`, confirmed live during setup.
 
 ## Environment variables (this routine's cloud environment)
 `BUFFER_API_KEY` (read-only use here, same value as CLAUDE.md's routine), `VAPI_PRIVATE_KEY`, `VAPI_PHONE_NUMBER_ID`, `VAPI_ALERT_TARGET_NUMBER`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`. Same values as this project's local `.env` — do not commit `.env`.
