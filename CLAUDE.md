@@ -54,12 +54,29 @@ All remaining Not-Ready rows (D4 onward) are Media Type=Carousel. Reel only appl
 Signed upload to `https://api.cloudinary.com/v1_1/$CLOUDINARY_CLOUD_NAME/image/upload`, signature = `sha1("public_id=<id>&timestamp=<ts>" + $CLOUDINARY_API_SECRET)`.
 
 ## Alerting
-Telegram only (kept simple — no voice-call layer for this cloud version).
-- Failure: full detail — day, error, sheet link.
-- Post-live: day + Music Suggestion, reminder to add the track manually from phone (Instagram's music picker is mobile-app-only, not available via API).
+- Failure (Telegram only): full detail — day, error, sheet link.
+- Post-live (Telegram only): day + Music Suggestion, reminder to add the track manually from phone (Instagram's music picker is mobile-app-only, not available via API).
+- **Daily run summary call (Vapi)** — fires once, unconditionally, after both sweeps finish (success or failure, every run, not just on error). See below.
+
+## Daily run summary call
+Runs at the very end of every run, after Sweep 1 and Sweep 2 both complete — this is a status update, not a failure-only alert.
+
+Persona: **"Alex, your content ops assistant"** — speaks like a real team member giving a routine daily report, not a robotic alert.
+
+Build the script from what actually happened this run:
+- Sweep 1: how many Scheduled rows were checked, and their outcome (e.g. "still pending, nothing new" / "day 2 confirmed live" / "day 3 failed, flagged").
+- Sweep 2: which Day was prepared, its Hook/Topic, and outcome (scheduled successfully for its date at 9 PM IST / failed, with a one-line reason).
+- If anything failed anywhere in the run, say so plainly and point to Telegram for full detail — don't read the full error aloud.
+- Close naturally, e.g. "That's everything for today. Goodbye."
+
+Example (all-success day): *"Hey, it's Alex with your Marcus content update. Today's scheduled posts are still pending, nothing new to report there. I prepared day 5's carousel — 'the comparison trap' — and it's scheduled to go live tonight at 9 PM. Everything ran clean today. That's it from me — goodbye."*
+
+Example (a failure occurred): *"Hey, it's Alex with your Marcus content update. Day 3's post failed to publish — check Telegram for the full error. I prepared day 6's carousel — 'why discipline beats motivation' — that one's scheduled fine for tonight. That's today's update — goodbye."*
+
+**Vapi call spec**: `Authorization: Bearer $VAPI_PRIVATE_KEY`, `POST https://api.vapi.ai/call`, `phoneNumberId=$VAPI_PHONE_NUMBER_ID`, `customer.number=$VAPI_ALERT_TARGET_NUMBER`, transient inline assistant (no saved assistantId), model `gpt-4o-mini`, voice provider `vapi` voiceId `Elliot`, `maxDurationSeconds: 60` (longer than the simple failure/post-live alerts elsewhere — this one has more to report).
 
 ## Environment variables (cloud environment config)
-`BUFFER_API_KEY`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`. (Same values as this project's local `.env` — do not commit `.env` to this repo.)
+`BUFFER_API_KEY`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `VAPI_PRIVATE_KEY`, `VAPI_PHONE_NUMBER_ID`, `VAPI_ALERT_TARGET_NUMBER`. (Same values as this project's local `.env` — do not commit `.env` to this repo.)
 
 ## Setup script (cloud environment)
 ```bash
