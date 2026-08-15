@@ -37,10 +37,11 @@ All remaining Not-Ready rows (D4 onward) are Media Type=Carousel. Reel only appl
 ## Carousel generation
 1. 8-10 slide shot list (10 is Instagram's hard cap — trim/merge before hitting it, don't rely on last-minute trimming): cover/hook -> thesis/reframe -> "here are N things" -> numbered list points -> attributed Stoic quote (Marcus Aurelius / Epictetus / Seneca) -> payoff -> close (engagement question + save-CTA).
 2. Fill `carousel_template/build_slides.py`'s `SLIDES` dict with that day's content (role guide is in the file's docstring), run it -> writes `carousel_template/html/slide_NN.html`.
-3. Render each to PNG with the `capture-website` CLI (installed via the cloud environment's setup script, no browser needed):
-   `capture-website "carousel_template/html/slide_NN.html" --output="carousel_template/slides/slide_NN.png" --width=1080 --height=1350 --overwrite`
+3. Render each to PNG with the `capture-website` CLI (installed via the cloud environment's setup script, no browser needed). The environment runs as root, so Chromium needs the sandbox disabled — always pass it, don't wait to hit the crash first:
+   `capture-website "carousel_template/html/slide_NN.html" --output="carousel_template/slides/slide_NN.png" --width=1080 --height=1350 --overwrite --launch-options='{"args":["--no-sandbox"]}'`
 4. Upload each PNG to Cloudinary (signed upload, see below), collect `secure_url`s in slide order, join with commas -> that's the Media URL column value.
 5. Write the caption using `carousel_template/caption_formula.md`'s formula, from this row's actual Hook/Topic, CTA, Pillar.
+6. Write a Music Suggestion into column M: mood/genre + 1-2 concrete track/artist name commonly on Instagram, based on this row's Hook/Topic and Pillar — a starting point to search on the phone, not a guaranteed-available track. This is read later by the separate Post-Live Music Alert routine (see MUSIC_ALERT.md) — don't skip it.
 
 ## Buffer (GraphQL)
 `https://api.buffer.com/graphql`, `Authorization: Bearer $BUFFER_API_KEY`, channel `6a7611ab99afb443491dd3a3` (marcus.stoic.calm).
@@ -65,6 +66,12 @@ Telegram only (kept simple — no voice-call layer for this cloud version).
 #!/bin/bash
 npm install -g capture-website-cli
 ```
+
+## Repo hygiene
+This repo holds the routine's code/spec/templates only — never commit or push generated per-run content (rendered slide HTML/PNGs, etc.) back to it. The sheet, Cloudinary, and Buffer are the actual source of truth for what was posted; git history isn't needed for that and the cloud environment may not even persist commits between runs. Generated files can be written to a scratch/temp path and discarded.
+
+## Related routine
+A second, separate routine — **Post-Live Music Alert** — runs daily at 9:05 PM IST to confirm each day's post actually went live and prompt adding music from the phone. Spec: [MUSIC_ALERT.md](MUSIC_ALERT.md). It depends on this routine's Sweep 2 having written that day's Music Suggestion (column M) — don't skip that step.
 
 ## Scope
 Instagram only — no TikTok/YouTube/LinkedIn. Don't touch rows beyond what Sweep 1/Sweep 2 naturally pick.
