@@ -58,6 +58,8 @@ Signed upload to `https://api.cloudinary.com/v1_1/$CLOUDINARY_CLOUD_NAME/image/u
 - Post-live (Telegram only): day + Music Suggestion, reminder to add the track manually from phone (Instagram's music picker is mobile-app-only, not available via API).
 - **Daily run summary call (Vapi)** — fires once, unconditionally, after both sweeps finish (success or failure, every run, not just on error). See below.
 
+**Telegram mechanism**: raw Bot API, same pattern as Buffer/Vapi/Cloudinary — no connector. `POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage` with JSON body `{ "chat_id": "$TELEGRAM_CHAT_ID", "text": "<message>" }`.
+
 ## Daily run summary call
 Runs at the very end of every run, after Sweep 1 and Sweep 2 both complete — this is a status update, not a failure-only alert.
 
@@ -76,7 +78,7 @@ Example (a failure occurred): *"Hey, it's Alex with your Marcus content update. 
 **Vapi call spec**: `Authorization: Bearer $VAPI_PRIVATE_KEY`, `POST https://api.vapi.ai/call`, `phoneNumberId=$VAPI_PHONE_NUMBER_ID`, `customer.number=$VAPI_ALERT_TARGET_NUMBER`, transient inline assistant (no saved assistantId), model `gpt-4o-mini`, voice provider `vapi` voiceId `Elliot`, `maxDurationSeconds: 60` (longer than the simple failure/post-live alerts elsewhere — this one has more to report).
 
 ## Environment variables (cloud environment config)
-`BUFFER_API_KEY`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `VAPI_PRIVATE_KEY`, `VAPI_PHONE_NUMBER_ID`, `VAPI_ALERT_TARGET_NUMBER`. (Same values as this project's local `.env` — do not commit `.env` to this repo.)
+`BUFFER_API_KEY`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `VAPI_PRIVATE_KEY`, `VAPI_PHONE_NUMBER_ID`, `VAPI_ALERT_TARGET_NUMBER`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`. (Same values as this project's local `.env` — do not commit `.env` to this repo.)
 
 ## Setup script (cloud environment)
 ```bash

@@ -32,13 +32,13 @@ Daily, 9:05 PM IST (Custom time trigger, 5 min after Buffer's fixed post time �
 - **Failure script**: *"Alert. Instagram post for day \<Day> failed to go live. \<one-line reason>. For full error details, check the Telegram message. Goodbye."*
 
 ## Telegram
-Send via the Telegram connector (same as used in this session) — not a raw bot-token env var. Add "Telegram" in this routine's Connectors panel alongside Zapier.
+Raw Bot API call, same pattern as Buffer/Vapi — no connector needed: `POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage` with JSON body `{ "chat_id": "$TELEGRAM_CHAT_ID", "text": "<message>" }`.
 
 ## Environment variables (this routine's cloud environment)
-`BUFFER_API_KEY` (read-only use here, same value as CLAUDE.md's routine), `VAPI_PRIVATE_KEY`, `VAPI_PHONE_NUMBER_ID`, `VAPI_ALERT_TARGET_NUMBER`. Same values as this project's local `.env` — do not commit `.env`.
+`BUFFER_API_KEY` (read-only use here, same value as CLAUDE.md's routine), `VAPI_PRIVATE_KEY`, `VAPI_PHONE_NUMBER_ID`, `VAPI_ALERT_TARGET_NUMBER`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`. Same values as this project's local `.env` — do not commit `.env`.
 
 ## Connectors
-Zapier (Google Sheets), Telegram. No Cloudinary, no capture-website — this routine generates nothing, only checks and alerts.
+Zapier (Google Sheets) only. No Cloudinary, no capture-website, no Telegram connector — this routine generates nothing, only checks and alerts, and Telegram goes via raw API like Buffer/Vapi.
 
 ## Repo hygiene
 Same rule as CLAUDE.md — this routine writes to the sheet only, never commits/pushes anything to this repo.
