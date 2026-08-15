@@ -14,7 +14,7 @@ Daily, 9:05 PM IST (Custom time trigger, 5 min after Buffer's fixed post time �
 1. Read the Instagram Queue tab (spreadsheet `1_kQX8A596S1dj3BEmOaBdy-IrqHZ84DkVEe_H53xXwc`, tab "Instagram Queue", gid `2120158175` — same sheet as CLAUDE.md, via Zapier).
 2. Find the row where **Date = today** (IST). If Status is already `Posted` (rare — main routine's morning Sweep 1 must have already confirmed a previous day's stray row), skip, nothing to do.
 3. If no Buffer Post ID on today's row, skip — nothing was scheduled for today (shouldn't normally happen if the daily routine is keeping pace, but don't error on it).
-4. Query Buffer directly (don't trust the sheet's Status column, it may not be updated yet): `query($id: PostId!) { post(id: $id) { status sentAt error { message } } }` using today's row's Buffer Post ID. Same GraphQL endpoint/auth as CLAUDE.md: `https://api.buffer.com/graphql`, `Authorization: Bearer $BUFFER_API_KEY`.
+4. Query Buffer directly (don't trust the sheet's Status column, it may not be updated yet): `query($input: PostInput!) { post(input: $input) { status sentAt error { message } } }` with `input: { id: <Buffer Post ID> }` — same schema-change fix as CLAUDE.md, confirmed live 15-Aug-2026. Same GraphQL endpoint/auth as CLAUDE.md: `https://api.buffer.com/graphql`, `Authorization: Bearer $BUFFER_API_KEY`.
 5. **`status: sent`** — confirmed live:
    - Update the sheet row: Status = `Posted`, Posted Timestamp = `sentAt`, Scheduled = TRUE (same write the main routine's next Sweep 1 would have made — doing it here just closes the gap same-day; idempotent, no conflict if the morning sweep also touches it later and finds it already `Posted`).
    - Read that row's Music Suggestion (column M — written by the carousel routine's Sweep 2, see CLAUDE.md). If blank (shouldn't happen once CLAUDE.md's fix is live, but don't crash if it does — generate one on the fly from the row's Hook/Topic + Pillar instead).
@@ -41,7 +41,7 @@ Raw Bot API call, same pattern as Buffer/Vapi — no connector needed: `POST htt
 Zapier (Google Sheets) only. No Cloudinary, no capture-website, no Telegram connector — this routine generates nothing, only checks and alerts, and Telegram goes via raw API like Buffer/Vapi.
 
 ## Repo hygiene
-Same rule as CLAUDE.md — this routine writes to the sheet only, never commits/pushes anything to this repo.
+Same rule as CLAUDE.md — this routine writes to the sheet only, never commits/pushes anything to this repo, and never attempts a git write operation even to fix a bug it finds here (this environment's token is read-only by design — retrying won't change that). Report spec problems via the existing Telegram alert format instead of inventing a new one; a human applies the fix.
 
 ## Scope
 Exactly one row per run — today's row only. Never touches other rows, never generates content, never schedules posts — that's the other routine's job entirely.

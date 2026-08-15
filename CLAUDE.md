@@ -45,7 +45,7 @@ All remaining Not-Ready rows (D4 onward) are Media Type=Carousel. Reel only appl
 
 ## Buffer (GraphQL)
 `https://api.buffer.com/graphql`, `Authorization: Bearer $BUFFER_API_KEY`, channel `6a7611ab99afb443491dd3a3` (marcus.stoic.calm).
-- Status check: `query($id: PostId!) { post(id: $id) { status sentAt error { message } } }`
+- Status check: `query($input: PostInput!) { post(input: $input) { status sentAt error { message } } }` with `input: { id: <Buffer Post ID> }`. **Schema change, confirmed live 15-Aug-2026**: the old bare `post(id: $id)` shape now fails validation — Buffer wraps the id in a `PostInput` object, matching the `input:` convention their mutations already use. Independently re-verified against the live API before applying this fix.
 - Schedule: `mutation($input: CreatePostInput!) { createPost(input: $input) { __typename ... on PostActionSuccess { post { id status dueAt } } ... on InvalidInputError { message } ... on UnexpectedError { message } ... on LimitReachedError { message } } }` with `input: { channelId: "6a7611ab99afb443491dd3a3", text: <caption>, assets: [{ image: { url } }, ...] (max 10, order matters), mode: "customScheduled", dueAt: "<row Date>T15:30:00Z", schedulingType: "automatic", needsApproval: false, saveToDraft: false, metadata: { instagram: { type: "post", shouldShareToFeed: true } } }`.
   **Critical, already-fixed bug**: `metadata.instagram.type` must be `"post"`, NOT `"carousel"` — that value is rejected by Buffer's API. Instagram determines carousel-vs-single purely from asset count; multiple `image` assets with `type: "post"` is what actually produces a real carousel. Confirmed live 14-Aug-2026.
 - Cancel if ever needed: `mutation($id: PostId!) { deletePost(input: { id: $id }) { __typename ... on VoidMutationError { message } } }`.
@@ -88,6 +88,8 @@ npm install -g capture-website-cli
 
 ## Repo hygiene
 This repo holds the routine's code/spec/templates only — never commit or push generated per-run content (rendered slide HTML/PNGs, etc.) back to it. The sheet, Cloudinary, and Buffer are the actual source of truth for what was posted; git history isn't needed for that and the cloud environment may not even persist commits between runs. Generated files can be written to a scratch/temp path and discarded.
+
+**Never attempt any git write operation from within a run** — no commit, no push, no branch creation — even to fix a bug discovered in this doc. This environment's token is read-only against the repo by design; repeated attempts and retries just burn the run on a call that will never succeed. If something in this spec turns out to be wrong or outdated (an API schema change, a broken assumption, etc.), report it via the existing failure Telegram alert format (day/context, what's wrong, sheet link) and stop — don't invent a new alert type or notification channel for it. A human applies the actual fix to the repo.
 
 ## Related routine
 A second, separate routine — **Post-Live Music Alert** — runs daily at 9:05 PM IST to confirm each day's post actually went live and prompt adding music from the phone. Spec: [MUSIC_ALERT.md](MUSIC_ALERT.md). It depends on this routine's Sweep 2 having written that day's Music Suggestion (column M) — don't skip that step.
