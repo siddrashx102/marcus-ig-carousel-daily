@@ -5,7 +5,7 @@ Single automated routine, runs daily in a Claude Code cloud environment. Posts o
 This replaces an earlier local-machine routine ("Daily ig post marcus") — that one is being retired, this cloud routine is now the only one touching the queue. No locking/collision logic needed as a result — single writer.
 
 ## Persona reference
-- Niche: stoic mindset / discipline, pain-point angle. Full tone/format notes: [content_format.md](content_format.md).
+- Niche: stoic mindset / discipline, pain-point angle. Full tone/format notes: [content_format.md](Instagram/content_format.md).
 - Funnel product: "Unshakable" ebook, `https://thedigitalvault2025.gumroad.com/l/unshakable`.
 
 ## Sheet — single source of truth
@@ -36,12 +36,12 @@ All remaining Not-Ready rows (D4 onward) are Media Type=Carousel. Reel only appl
 
 ## Carousel generation
 1. 8-10 slide shot list (10 is Instagram's hard cap — trim/merge before hitting it, don't rely on last-minute trimming): cover/hook -> thesis/reframe -> "here are N things" -> numbered list points -> attributed Stoic quote (Marcus Aurelius / Epictetus / Seneca) -> payoff -> close (engagement question + save-CTA).
-2. Fill `carousel_template/build_slides.py`'s `SLIDES` dict with that day's content (role guide is in the file's docstring), run it -> writes `carousel_template/html/slide_NN.html`.
+2. Fill `Instagram/carousel_template/build_slides.py`'s `SLIDES` dict with that day's content (role guide is in the file's docstring), run it -> writes `Instagram/carousel_template/html/slide_NN.html`.
 3. Render each to PNG with the `capture-website` CLI (installed via the cloud environment's setup script, no browser needed). The environment runs as root, so Chromium needs the sandbox disabled — always pass it, don't wait to hit the crash first:
-   `capture-website "carousel_template/html/slide_NN.html" --output="carousel_template/slides/slide_NN.png" --width=1080 --height=1350 --overwrite --launch-options='{"args":["--no-sandbox"]}'`
+   `capture-website "Instagram/carousel_template/html/slide_NN.html" --output="Instagram/carousel_template/slides/slide_NN.png" --width=1080 --height=1350 --overwrite --launch-options='{"args":["--no-sandbox"]}'`
 4. Upload each PNG to Cloudinary (signed upload, see below), collect `secure_url`s in slide order, join with commas -> that's the Media URL column value.
-5. Write the caption using `carousel_template/caption_formula.md`'s formula, from this row's actual Hook/Topic, CTA, Pillar.
-6. Write a Music Suggestion into column M: mood/genre + 1-2 concrete track/artist name commonly on Instagram, based on this row's Hook/Topic and Pillar — a starting point to search on the phone, not a guaranteed-available track. This is read later by the separate Post-Live Music Alert routine (see MUSIC_ALERT.md) — don't skip it.
+5. Write the caption using `Instagram/carousel_template/caption_formula.md`'s formula, from this row's actual Hook/Topic, CTA, Pillar.
+6. Write a Music Suggestion into column M: mood/genre + 1-2 concrete track/artist name commonly on Instagram, based on this row's Hook/Topic and Pillar — a starting point to search on the phone, not a guaranteed-available track. This is read later by the separate Post-Live Music Alert routine (see Instagram/MUSIC_ALERT.md) — don't skip it.
 
 ## Buffer (GraphQL)
 `https://api.buffer.com/graphql`, `Authorization: Bearer $BUFFER_API_KEY`, channel `6a7611ab99afb443491dd3a3` (marcus.stoic.calm).
@@ -92,7 +92,7 @@ This repo holds the routine's code/spec/templates only — never commit or push 
 **Never attempt any git write operation from within a run** — no commit, no push, no branch creation — even to fix a bug discovered in this doc. This environment's token is read-only against the repo by design; repeated attempts and retries just burn the run on a call that will never succeed. If something in this spec turns out to be wrong or outdated (an API schema change, a broken assumption, etc.), report it via the existing failure Telegram alert format (day/context, what's wrong, sheet link) and stop — don't invent a new alert type or notification channel for it. A human applies the actual fix to the repo.
 
 ## Related routine
-A second, separate routine — **Post-Live Music Alert** — runs daily at 9:05 PM IST to confirm each day's post actually went live and prompt adding music from the phone. Spec: [MUSIC_ALERT.md](MUSIC_ALERT.md). It depends on this routine's Sweep 2 having written that day's Music Suggestion (column M) — don't skip that step.
+A second, separate routine — **Post-Live Music Alert** — runs daily at 9:05 PM IST to confirm each day's post actually went live and prompt adding music from the phone. Spec: [MUSIC_ALERT.md](Instagram/MUSIC_ALERT.md). It depends on this routine's Sweep 2 having written that day's Music Suggestion (column M) — don't skip that step.
 
 ## Scope
 Instagram only — no TikTok/YouTube/LinkedIn. Don't touch rows beyond what Sweep 1/Sweep 2 naturally pick.
