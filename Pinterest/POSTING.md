@@ -47,8 +47,32 @@ Pinterest: **thedigitalvault02** — boards `eBooks`, `Mindset & Mental Strength
    - Mindset & Mental Strength: `924926910912102483`
    - Products you tagged: `924926910911597111`
 
+## Link routing (decided 2026-08-16)
+
+The board already had 7 pre-existing direct-offer pins (from before this session) linking straight to Gumroad product pages — that pattern is fine for genuine direct-offer content. The problem was our own first two test pins linking to Gumroad despite being purely educational (habit-list) content, no direct pitch. Rule going forward:
+
+| Content type | Link |
+|---|---|
+| Educational/habit/quote pins (most pins) | No link — pure reach/save pin, drives profile follows |
+| Direct-offer pins (explicit "get Unshakable" CTA, matches the account's existing pre-2026-08-16 pins) | Gumroad product page |
+| Freebie/journal pins | **Blocked** — no dedicated opt-in landing page exists yet. Don't point these at the Gumroad Unshakable page (wrong offer). Needs a real destination (e.g. a free $0 Gumroad listing for the 7-Day journal) before these pins can go out with a working link. |
+
+**Known issue, unresolved:** Zapier's Pinterest connection (`PinterestCLIAPI`) goes stale after exactly one call, even immediately after a fresh reconnect — reproduced 3 times in a row (create carousel worked once, then every subsequent read/write failed with "stale connection" until reconnected, then died again after one more call). Root cause not identified — looks like a token-refresh bug on Zapier's side, not a usage error here. Until it's fixed, retroactive edits (`PATCH /v5/pins/{id}`) to existing pins are unreliable via this path.
+
+**Fixed 2026-08-16** — link removed by hand in the Pinterest app on both mismatched pins (API path proved unreliable, see above), confirmed via `GET /v5/pins/{id}` returning `"link": null`:
+- [pinterest.com/pin/924926842246983748](https://www.pinterest.com/pin/924926842246983748/) — "3 Stoic Habits for an Unshakable Mind"
+- [pinterest.com/pin/924926842246983384](https://www.pinterest.com/pin/924926842246983384/) — "7 Stoic Habits for an Unshakable Mind"
+
+## Profile (manual — no API for this)
+
+Pinterest v5 only exposes `GET /user_account`, no update endpoint — display name and bio have to be edited by hand in Pinterest's own Edit Profile screen.
+
+- Display name: `TheDigitalVault | Stoic Habits & Mental Toughness`
+- Bio: `Stoic quotes, daily habits & mindset tools to build self-discipline and stop overthinking. Inspired by Marcus Aurelius, Seneca & Epictetus.`
+
 ## What's NOT automated yet
 
 - No scheduling — every post above published immediately (`shareNow`-equivalent; the raw Pinterest API call is instant, there's no `dueAt`/queue concept in this flow yet). If timed posting is wanted later, either delay the API call externally (cron) or investigate Pinterest's own scheduling support.
 - No sheet-backed content queue (unlike Instagram's "Instagram Queue" tab) — pins are hand-specified in `build_pins.py` per run. Worth adding a "Pinterest Queue" sheet tab if this becomes a daily routine, mirroring root `CLAUDE.md`'s Sweep 1/Sweep 2 structure.
 - No verification/alerting step (no Telegram/Vapi confirmation that a pin actually stayed live) — add if this becomes unattended.
+- Zapier's Pinterest connection stability issue above — needs investigating before this pipeline can run unattended.
