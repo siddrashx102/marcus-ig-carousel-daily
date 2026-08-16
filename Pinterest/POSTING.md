@@ -65,10 +65,15 @@ The board already had 7 pre-existing direct-offer pins (from before this session
 
 ## Profile (manual — no API for this)
 
-Pinterest v5 only exposes `GET /user_account`, no update endpoint — display name and bio have to be edited by hand in Pinterest's own Edit Profile screen.
+Pinterest v5 only exposes `GET /user_account`, no update endpoint — display name and bio have to be edited by hand in Pinterest's own Edit Profile screen (done via the Pinterest web app, not the API).
 
-- Display name: `TheDigitalVault | Stoic Habits & Mental Toughness`
-- Bio: `Stoic quotes, daily habits & mindset tools to build self-discipline and stop overthinking. Inspired by Marcus Aurelius, Seneca & Epictetus.`
+**Note:** the account wasn't a blank slate — it already carried an older, broader "Digital Vault" bio covering multiple self-improvement ebooks (Unshakable, The Happiness Code, others). Decision **2026-08-16**: pivot the profile to the Stoicism/mindset niche specifically rather than the general self-improvement umbrella, so it stays evergreen for future ebooks in *this* niche without being tied to one product name.
+
+**Applied and confirmed live 2026-08-16** (verified via `GET /v5/user_account`):
+- `business_name`: `TheDigitalVault | Stoic Mindset & Discipline`
+- `about`: `Stoic habits, daily prompts, and mindset tools for building real self-discipline. Wisdom from Marcus Aurelius, Seneca, and Epictetus, turned into things you can actually do today.`
+- `website_url`: `thedigitalvault2025.gumroad.com/l/unshakable` — points at the single current ebook directly since it's the only product live right now; revisit to the general storefront URL once a second product exists.
+- `username`: unchanged, `thedigitalvault02`. Tried changing to `the.digital.vault` first — Pinterest rejected it outright ("A username must contain only numbers and letters", no dots/periods allowed) — and username changes would have broken every existing pin URL anyway, so reverted.
 
 ## What's NOT automated yet
 
