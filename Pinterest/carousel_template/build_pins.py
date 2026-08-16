@@ -2,13 +2,19 @@
 """
 Pinterest carousel slide HTML generator for @marcus.stoic.calm's Pinterest
 strategy (see ../01_competitor_breakdown.md through ../04_30_day_publishing_plan.md).
+Posting pipeline/spec lives in ../POSTING.md.
 
 Same visual system as the Instagram carousel template (../../Instagram/carousel_template/
 build_slides.py) for cross-platform brand consistency, resized to Pinterest's
 recommended pin ratio: 1000x1500 (2:3), not Instagram's 1080x1350 (4:5).
 
+STANDARD FORMAT: native Pinterest carousel Pins, posted via Pinterest's own v5 API
+(not Buffer, which has no carousel support). Pinterest's real carousel cap is
+2-5 images per Pin (swipeable, not auto-scroll) -- every PINS entry must stay
+in that 2-5 range, unlike Instagram's up-to-10 cap.
+
 Usage: fill/extend the PINS dict below (one entry per pin, each with its own
-slide list), run this script -> writes HTML to
+2-5 slide list), run this script -> writes HTML to
 ./html/<slug>/slide_NN.html, then render each with:
 
   capture-website "html/<slug>/slide_01.html" --output="slides/<slug>/slide_01.png" \
@@ -190,6 +196,35 @@ PINS = {
 <div class="headline small">Get your free copy.</div>
 <div class="cta-line">Tap the link on this pin to download the</div>
 <div class="cta-line cta-strong">7-Day Stoic Reset Journal &mdash; free PDF, delivered instantly.</div>
+""",
+        },
+    },
+
+    "pin_04_3_stoic_habits_carousel": {
+        "save_cta": "SWIPE FOR ALL 3",
+        "slides": {
+            1: """
+<div class="eyebrow">STOIC HABITS</div>
+<div class="headline">3 Stoic Habits<br>for an Unshakable Mind</div>
+<div class="rule"></div>
+<div class="sub">Simple daily practices, straight from Marcus Aurelius</div>
+""",
+            2: """
+<div class="number-badge">1</div>
+<div class="statement">Read one page of Stoic writing before you check your phone.</div>
+""",
+            3: """
+<div class="number-badge">2</div>
+<div class="statement">Name what's in your control today &mdash; and let the rest go.</div>
+""",
+            4: """
+<div class="number-badge">3</div>
+<div class="statement">Do the hard task first, while your discipline is freshest.</div>
+""",
+            5: """
+<div class="quote-mark">&ldquo;</div>
+<div class="quote-text">You have power over your mind &mdash; not outside events. Realize this, and you will find strength.</div>
+<div class="attribution">MARCUS AURELIUS</div>
 """,
         },
     },
